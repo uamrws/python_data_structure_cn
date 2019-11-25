@@ -9,10 +9,31 @@
     要想求出n个盘子需要多少次，只需知道n-1个盘子需要多少次，只需要将n-1个盘子移动两次，
     再加一次第n个盘子的移动即可
 """""
+
+
 # 递归解决
 def hanoi(num):
     if num==1:
         return 1
     return 2*hanoi(num-1)+1
 
-print(hanoi(64))
+if __name__ == '__main__':
+    print(hanoi(64))
+
+
+# 汉塔诺步骤模拟
+# 要求：将x位置(左侧)的圆盘移动到y位置(中间)
+def hanoi(num, x, y, z):
+    # 没有圆盘不动
+    if num == 0:
+        return
+    # 步骤1：首先将除最后一层所有圆盘移动到z位置
+    hanoi(num-1, x, z, y)
+    # 步骤2：将最后一层圆盘移动到y位置
+    print(f"{x}==>{y}")
+    # 步骤3：将z位置的所有圆盘在移回到y位置，大功告成
+    hanoi(num-1, z, y, x)
+
+
+if __name__ == '__main__':
+    hanoi(6, "A", "B", "C")

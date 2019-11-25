@@ -3,7 +3,7 @@
 
 Heap是一种数据结构具有以下的特点：
 1）完全二叉树；（完整的二叉树是一个树，其中每个层都有其所有的节点，除了树的最底层，从左到右填充。）
-2）heap中存储的值是偏序（https://zh.wikipedia.org/wiki/%E5%81%8F%E5%BA%8F%E5%85%B3%E7%B3%BB）；
+2）heap中存储的值是偏序的（https://zh.wikipedia.org/wiki/%E5%81%8F%E5%BA%8F%E5%85%B3%E7%B3%BB）；
 
 
 二叉堆是很有趣的研究，因为堆看起来很像一棵树，但是当我们实现它时，我们只使用一个
@@ -19,8 +19,10 @@ Heap是一种数据结构具有以下的特点：
 和引用，甚至列表的列表。因为树是完整的，父节点的左子节点（在位置 p 处，此处的p是指下标+1）是在列表中
 位置 2p 中找到的节点。 类似地，父节点的右子节点在列表中的位置 2p + 1
 # 推导如下：
+
+# 每层的节点个数以公式sum(n)表示，(2^n -1)
 # 假设节点在当前第n层的p位置，其左右子节点则一定是n+1层的2p-1和2p位置，
-# 可以求得节点在列表中的位置x=sum(n-1)+p，左子节点的位置y=sum(n)+p。
+# 则父节点列表中的位置x=sum(n-1)+p ==> 2x=sum(n)+2p-1，左子节点的位置y=sum(n)+2p-1。
 # sum是所有n层之前的节点数目之和，即等比数列求和公式可得，接下来的过程不细说了。
 
 结论就是 当前节点的父节点可以通过将当前节点的索引除以 2 取整来计算
@@ -55,31 +57,12 @@ class BinaryHeap(object):
         # 循环直到当前为根节点，或者值大于父节点的值
         while current_pos // 2 > 0 and val < self._heap_list[current_pos // 2]:
             (
-                self._heap_list[current_pos]
-                , self._heap_list[current_pos // 2]
+                self._heap_list[current_pos], self._heap_list[current_pos // 2]
             ) = (
-                self._heap_list[current_pos // 2]
-                , self._heap_list[current_pos]
+                self._heap_list[current_pos // 2], self._heap_list[current_pos]
             )
 
             current_pos = current_pos // 2
-
-    # 从当前节点开始，递归的向子节点重构最小堆
-    def rebuild_min_heap(self, current_pos):
-        # 如果当前节点*2 超出整个堆列表的范围，则说明这个节点是最后的非叶节点
-        while current_pos * 2 <= self._size:
-            # 对比当前节点和两个子节点，并和最小的节点比较，如果大于则互换，否则结束循环
-            child_pos = self.min_child(current_pos)
-            if self._heap_list[current_pos] <= self._heap_list[child_pos]:
-                break
-            (
-                self._heap_list[current_pos]
-                , self._heap_list[child_pos]
-            ) = (
-                self._heap_list[child_pos]
-                , self._heap_list[current_pos]
-            )
-            current_pos = child_pos
 
     def min_child(self, current_pos):
         left_child_pos = current_pos * 2
@@ -96,11 +79,25 @@ class BinaryHeap(object):
         else:
             return right_child_pos
 
+    # 从当前节点开始，递归的向子节点重构最小堆
+    def rebuild_min_heap(self, current_pos):
+        # 如果当前节点*2 超出整个堆列表的范围，则说明这个节点是最后的非叶节点
+        while current_pos * 2 <= self._size:
+            # 对比当前节点和两个子节点，并和最小的节点比较，如果大于则互换，否则结束循环
+            child_pos = self.min_child(current_pos)
+            if self._heap_list[current_pos] <= self._heap_list[child_pos]:
+                break
+            (
+                self._heap_list[current_pos], self._heap_list[child_pos]
+            ) = (
+                self._heap_list[child_pos], self._heap_list[current_pos]
+            )
+            current_pos = child_pos
+
     def pop(self):
         # 交换根节点和最后一个节点的值
-        (self._heap_list[1]
-         , self._heap_list[-1]) = (self._heap_list[-1]
-                                   , self._heap_list[1])
+        (self._heap_list[1], self._heap_list[-1]
+         ) = (self._heap_list[-1], self._heap_list[1])
         # 获取根节点的值
         min_val = self._heap_list.pop()
         self._size -= 1
